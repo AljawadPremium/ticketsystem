@@ -93,11 +93,68 @@ while ($row = $trendResult->fetch_assoc()) {
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
 
-  <h2>IT Tickets Dashboard</h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>IT Tickets Dashboard</h2>
+    <button onclick="downloadPDF()" class="btn" style="background: #3498db; padding: 10px 20px;">Download Report
+      (PDF)</button>
+  </div>
+
+  <!-- HIDDEN PDF TEMPLATE -->
+  <div id="pdf-template" style="display: none; background: white; color: #333; padding: 40px; font-family: sans-serif;">
+    <h1 style="text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">IT Help Disk
+      Report</h1>
+    <p style="text-align: right; color: #666;">Generated on: <?= date('Y-m-d H:i') ?></p>
+
+    <div style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #c0392b;">
+        <h4 style="margin: 0;">Total Issues</h4>
+        <h2 style="margin: 5px 0;"><?= $issuesCount ?></h2>
+      </div>
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #2ecc71;">
+        <h4 style="margin: 0;">Total Fixed</h4>
+        <h2 style="margin: 5px 0;"><?= $fixedCount ?></h2>
+      </div>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h3>1. Issues vs Fixed Persistence</h3>
+      <p style="color: #555;">This diagram shows the ratio between reported issues and resolved tickets. A higher fixed
+        count indicates positive IT performance.</p>
+      <div id="pdf-chart-1" style="width: 100%; height: 300px; text-align: center;"></div>
+    </div>
+
+    <div style="margin-top: 30px; page-break-before: always;">
+      <h3>2. Fixed Issues by Type</h3>
+      <p style="color: #555;">Detailed breakdown of resolved problems by category. This helps identify recurring
+        technical themes and training needs.</p>
+      <div id="pdf-chart-2" style="width: 100%; height: 300px; text-align: center;"></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h3>3. Tickets by Branch</h3>
+      <p style="color: #555;">Shows which locations are reporting the most technical difficulties. Useful for regional
+        IT resource allocation.</p>
+      <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center;"></div>
+    </div>
+
+    <div style="margin-top: 30px; page-break-before: always;">
+      <h3>4. Tickets Over Time (Trend)</h3>
+      <p style="color: #555;">Visualizes the daily volume of tickets. Ideal for spotting spikes in problems or long-term
+        improvement in system stability.</p>
+      <div id="pdf-chart-4" style="width: 100%; height: 300px; text-align: center;"></div>
+    </div>
+
+    <div
+      style="margin-top: 50px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 12px; color: #999; text-align: center;">
+      End of IT Help Disk Report - Confidential IT Data
+    </div>
+  </div>
 
   <!-- =======================
      Charts Section
@@ -332,6 +389,44 @@ while ($row = $trendResult->fetch_assoc()) {
         }
       }
     });
+
+    /* ===== PDF Export Logic ===== */
+    async function downloadPDF() {
+      const { jsPDF } = window;
+      const template = document.getElementById('pdf-template');
+
+      // Show template temporarily for capturing
+      template.style.display = 'block';
+
+      // Capture charts as images and put them in the template
+      const charts = ['statusChart', 'typeChart', 'branchChart', 'trendChart'];
+      for (let i = 0; i < charts.length; i++) {
+        const canvas = document.getElementById(charts[i]);
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const container = document.getElementById(`pdf-chart-${i + 1}`);
+        container.innerHTML = `<img src="${imgData}" style="max-width: 100%; max-height: 100%;">`;
+      }
+
+      const opt = {
+        margin: 0.5,
+        filename: 'IT_Help_Disk_Report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      // Generate PDF
+      try {
+        await html2pdf().set(opt).from(template).save();
+      } finally {
+        // Hide template again
+        template.style.display = 'none';
+        // Clear images
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById(`pdf-chart-${i}`).innerHTML = '';
+        }
+      }
+    }
   </script>
 
 </body>
