@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+.env.*
+app/db.php
+
+# Docker
+*.pid
+
+# Kubernetes local artifacts
+*.yaml~

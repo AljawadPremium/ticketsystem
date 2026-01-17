@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: helpdesk_app
+    ports:
+      - "3015:80"
+    depends_on:
+      - db
+    volumes:
+      - ./app:/var/www/html
+    restart: always
+
+  db:
+    image: mysql:8.0
+    container_name: helpdesk_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass_helpdesk
+      MYSQL_DATABASE: it_helpdesk
+      MYSQL_USER: helpdesk_user
+      MYSQL_PASSWORD: helpdesk_pass
+    volumes:
+      - helpdesk_db_data:/var/lib/mysql
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: helpdesk_phpmyadmin
+    ports:
+      - "8087:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: helpdesk_user
+      PMA_PASSWORD: helpdesk_pass
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  helpdesk_db_data:
