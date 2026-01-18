@@ -101,8 +101,9 @@ while ($row = $trendResult->fetch_assoc()) {
 
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2>IT Tickets Dashboard</h2>
-    <button onclick="downloadPDF()" class="btn" style="background: #3498db; padding: 10px 20px;">Download Report
-      (PDF)</button>
+    <div style="text-align: right;">
+        <button onclick="downloadPDF()" style="background: #3498db; color: white; padding: 8px 12px; width: auto; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Download Report (PDF)</button>
+    </div>
   </div>
 
   <!-- HIDDEN PDF TEMPLATE -->
