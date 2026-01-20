@@ -109,66 +109,65 @@ while ($row = $trendResult->fetch_assoc()) {
   </div>
 
   <!-- HIDDEN PDF TEMPLATE -->
-  <div id="pdf-template"
-    style="display: none; background: url('assets/PDFbackground.jpeg') no-repeat center center; background-size: cover; color: #000; padding: 60px 40px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position: relative; min-height: 10in;">
-    <h1
-      style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0;">
-      IT Help Desk Performance Report</h1>
-    <p style="text-align: right; color: #666;">Generated on: <?= date('Y-m-d H:i') ?></p>
+  <div id="pdf-template" style="display: none; width: 8.5in; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #000;">
+    
+    <!-- PDF PAGE 1 -->
+    <div class="pdf-page" style="position: relative; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; page-break-after: always;">
+      <!-- Background Image for Page 1 -->
+      <img src="assets/PDFbackground.jpeg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover;">
+      
+      <h1 style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0;">IT Help Desk Performance Report</h1>
+      <p style="text-align: right; color: #666;">Generated on: <?= date('Y-m-d H:i') ?></p>
 
-    <div style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #c0392b;">
-        <h4 style="margin: 0;">Total Issues</h4>
-        <h2 style="margin: 5px 0;"><?= $issuesCount ?></h2>
+      <div style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="background: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 8px; border-left: 4px solid #c0392b;">
+          <h4 style="margin: 0;">Total Issues</h4>
+          <h2 style="margin: 5px 0;"><?= $issuesCount ?></h2>
+        </div>
+        <div style="background: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 8px; border-left: 4px solid #2ecc71;">
+          <h4 style="margin: 0;">Total Fixed</h4>
+          <h2 style="margin: 5px 0;"><?= $fixedCount ?></h2>
+        </div>
       </div>
-      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #2ecc71;">
-        <h4 style="margin: 0;">Total Fixed</h4>
-        <h2 style="margin: 5px 0;"><?= $fixedCount ?></h2>
+
+      <div style="margin-top: 30px;">
+        <h3>1. Issues vs Fixed Performance</h3>
+        <p style="color: #333; line-height: 1.6;">This diagram shows the relationship between reported issues and resolved tickets. 
+          Currently, there are <strong><?= $issuesCount ?></strong> active issues and <strong><?= $fixedCount ?></strong> fixed tickets. 
+          A higher fixed count indicates efficient IT performance and system reliability.</p>
+        <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
+      </div>
+
+      <div style="margin-top: 30px;">
+        <h3>3. Tickets by Branch</h3>
+        <p style="color: #333; line-height: 1.6;">Distribution of tickets across <strong><?= count($branchLabels) ?></strong> different locations. 
+          This analysis is crucial for understanding regional IT demand and optimizing resource allocation.</p>
+        <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; margin-top: 10px;"></div>
       </div>
     </div>
 
-    <div style="margin-top: 30px;">
-      <h3>1. Issues vs Fixed Performance</h3>
-      <p style="color: #333; line-height: 1.6;">This diagram shows the relationship between reported issues and resolved
-        tickets.
-        Currently, there are <strong><?= $issuesCount ?></strong> active issues and <strong><?= $fixedCount ?></strong>
-        fixed tickets.
-        A higher fixed count indicates efficient IT performance and system reliability.</p>
-      <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
-    </div>
+    <!-- PDF PAGE 2 -->
+    <div class="pdf-page" style="position: relative; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box;">
+      <!-- Background Image for Page 2 -->
+      <img src="assets/PDFbackground.jpeg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover;">
+      
+      <div style="margin-top: 0;">
+        <h3>2. Fixed Issues by Type</h3>
+        <p style="color: #333; line-height: 1.6;">Detailed breakdown of the <strong><?= $fixedCount ?></strong> resolved problems by category. 
+          This helps identify that <strong><?= count($problemLabels) ?></strong> different types of issues were successfully addressed.</p>
+        <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
+      </div>
 
-    <div style="margin-top: 30px; page-break-before: always; border-top: 2px solid #3498db; padding-top: 20px;">
-      <h3>2. Fixed Issues by Type</h3>
-      <p style="color: #333; line-height: 1.6;">Detailed breakdown of the <strong><?= $fixedCount ?></strong> resolved
-        problems by category.
-        This helps identify that <strong><?= count($problemLabels) ?></strong> different types of issues were
-        successfully addressed,
-        highlighting recurring technical themes and identifying specific areas for proactive maintenance.</p>
-      <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
-    </div>
+      <div style="margin-top: 40px;">
+        <h3>4. Tickets Over Time (Trend)</h3>
+        <p style="color: #333; line-height: 1.6;">Visualizes the volume of tickets over the last 14 days. 
+          With a daily average of <strong><?= count($trendCounts) > 0 ? round(array_sum($trendCounts) / count($trendCounts), 1) : 0 ?></strong> tickets.</p>
+        <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
+      </div>
 
-    <div style="margin-top: 30px;">
-      <h3>3. Tickets by Branch</h3>
-      <p style="color: #333; line-height: 1.6;">Distribution of tickets across
-        <strong><?= count($branchLabels) ?></strong> different locations.
-        This analysis is crucial for understanding regional IT demand and optimizing resource allocation for the most
-        active branches.</p>
-      <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; margin-top: 10px;"></div>
-    </div>
-
-    <div style="margin-top: 30px; page-break-before: always; border-top: 2px solid #3498db; padding-top: 20px;">
-      <h3>4. Tickets Over Time (Trend)</h3>
-      <p style="color: #333; line-height: 1.6;">Visualizes the volume of tickets over the last 14 days.
-        With a daily average of
-        <strong><?= count($trendCounts) > 0 ? round(array_sum($trendCounts) / count($trendCounts), 1) : 0 ?></strong>
-        tickets,
-        this trend helps in spotting sudden spikes and evaluating long-term system stability.</p>
-      <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
-    </div>
-
-    <div
-      style="margin-top: 50px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 12px; color: #999; text-align: center;">
-      End of IT Help Disk Report - Confidential IT Data
+      <div style="margin-top: 80px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 12px; color: #999; text-align: center;">
+        End of IT Help Desk Report - Confidential IT Data
+      </div>
     </div>
   </div>
 
@@ -304,7 +303,7 @@ while ($row = $trendResult->fetch_assoc()) {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#000000', font: { weight: 'bold' } }
+            labels: { color: '#f5f5f5', font: { weight: 'bold' } }
           }
         }
       }
@@ -331,7 +330,7 @@ while ($row = $trendResult->fetch_assoc()) {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#000000', font: { weight: 'bold' } }
+            labels: { color: '#f5f5f5' }
           }
         }
       }
@@ -358,11 +357,11 @@ while ($row = $trendResult->fetch_assoc()) {
         },
         scales: {
           x: {
-            ticks: { stepSize: 5, color: '#000000', precision: 0, font: { weight: 'bold' } },
-            grid: { color: 'rgba(0,0,0,0.1)' }
+            ticks: { stepSize: 5, color: '#f5f5f5', precision: 0 },
+            grid: { color: 'rgba(255,255,255,0.1)' }
           },
           y: {
-            ticks: { color: '#000000', font: { weight: 'bold' } },
+            ticks: { color: '#f5f5f5' },
             grid: { display: false }
           }
         }
@@ -394,13 +393,13 @@ while ($row = $trendResult->fetch_assoc()) {
         },
         scales: {
           x: {
-            ticks: { color: '#000000', font: { weight: 'bold' } },
-            grid: { color: 'rgba(0,0,0,0.05)' }
+            ticks: { color: '#f5f5f5' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
           },
           y: {
             beginAtZero: true,
-            ticks: { stepSize: 5, color: '#000000', precision: 0, font: { weight: 'bold' } },
-            grid: { color: 'rgba(0,0,0,0.1)' }
+            ticks: { stepSize: 5, color: '#f5f5f5', precision: 0 },
+            grid: { color: 'rgba(255,255,255,0.1)' }
           }
         }
       }
@@ -410,24 +409,36 @@ while ($row = $trendResult->fetch_assoc()) {
     async function downloadPDF() {
       const { jsPDF } = window;
       const template = document.getElementById('pdf-template');
+      
+      // Update Chart colors to Black for PDF capture
+      const chartIds = ['statusChart', 'typeChart', 'branchChart', 'trendChart'];
+      const chartInstances = chartIds.map(id => Chart.getChart(id));
+      
+      // 1. Switch to Black
+      chartInstances.forEach(chart => {
+        if (!chart) return;
+        if (chart.options.plugins.legend) chart.options.plugins.legend.labels.color = '#000000';
+        if (chart.options.scales && chart.options.scales.x) chart.options.scales.x.ticks.color = '#000000';
+        if (chart.options.scales && chart.options.scales.y) chart.options.scales.y.ticks.color = '#000000';
+        chart.update('none'); 
+      });
 
       // Show template temporarily for capturing
       template.style.display = 'block';
 
       // Capture charts as images and put them in the template
-      const charts = ['statusChart', 'typeChart', 'branchChart', 'trendChart'];
-      for (let i = 0; i < charts.length; i++) {
-        const canvas = document.getElementById(charts[i]);
+      for (let i = 0; i < chartIds.length; i++) {
+        const canvas = document.getElementById(chartIds[i]);
         const imgData = canvas.toDataURL('image/png', 1.0);
         const container = document.getElementById(`pdf-chart-${i + 1}`);
-        container.innerHTML = `<img src="${imgData}" style="max-width: 100%; max-height: 100%;">`;
+        if (container) container.innerHTML = `<img src="${imgData}" style="max-width: 100%; height: auto;">`;
       }
 
       const opt = {
-        margin: 0.5,
+        margin: 0,
         filename: 'IT_Help_Disk_Report.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
 
@@ -437,9 +448,20 @@ while ($row = $trendResult->fetch_assoc()) {
       } finally {
         // Hide template again
         template.style.display = 'none';
+        
+        // 2. Switch back to White for Dashboard
+        chartInstances.forEach(chart => {
+          if (!chart) return;
+          if (chart.options.plugins.legend) chart.options.plugins.legend.labels.color = '#f5f5f5';
+          if (chart.options.scales && chart.options.scales.x) chart.options.scales.x.ticks.color = '#f5f5f5';
+          if (chart.options.scales && chart.options.scales.y) chart.options.scales.y.ticks.color = '#f5f5f5';
+          chart.update('none');
+        });
+
         // Clear images
         for (let i = 1; i <= 4; i++) {
-          document.getElementById(`pdf-chart-${i}`).innerHTML = '';
+          const container = document.getElementById(`pdf-chart-${i}`);
+          if (container) container.innerHTML = '';
         }
       }
     }
