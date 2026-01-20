@@ -102,14 +102,18 @@ while ($row = $trendResult->fetch_assoc()) {
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2>IT Tickets Dashboard</h2>
     <div style="text-align: right;">
-        <button onclick="downloadPDF()" style="background: #3498db; color: white; padding: 8px 12px; width: auto; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Download Report (PDF)</button>
+      <button onclick="downloadPDF()"
+        style="background: #3498db; color: white; padding: 8px 12px; width: auto; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Download
+        Report (PDF)</button>
     </div>
   </div>
 
   <!-- HIDDEN PDF TEMPLATE -->
-  <div id="pdf-template" style="display: none; background: white; color: #333; padding: 40px; font-family: sans-serif;">
-    <h1 style="text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">IT Help Disk
-      Report</h1>
+  <div id="pdf-template"
+    style="display: none; background: url('assets/PDFbackground.jpeg') no-repeat center center; background-size: cover; color: #000; padding: 60px 40px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position: relative; min-height: 10in;">
+    <h1
+      style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0;">
+      IT Help Desk Performance Report</h1>
     <p style="text-align: right; color: #666;">Generated on: <?= date('Y-m-d H:i') ?></p>
 
     <div style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -124,31 +128,42 @@ while ($row = $trendResult->fetch_assoc()) {
     </div>
 
     <div style="margin-top: 30px;">
-      <h3>1. Issues vs Fixed Persistence</h3>
-      <p style="color: #555;">This diagram shows the ratio between reported issues and resolved tickets. A higher fixed
-        count indicates positive IT performance.</p>
-      <div id="pdf-chart-1" style="width: 100%; height: 300px; text-align: center;"></div>
+      <h3>1. Issues vs Fixed Performance</h3>
+      <p style="color: #333; line-height: 1.6;">This diagram shows the relationship between reported issues and resolved
+        tickets.
+        Currently, there are <strong><?= $issuesCount ?></strong> active issues and <strong><?= $fixedCount ?></strong>
+        fixed tickets.
+        A higher fixed count indicates efficient IT performance and system reliability.</p>
+      <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
     </div>
 
-    <div style="margin-top: 30px; page-break-before: always;">
+    <div style="margin-top: 30px; page-break-before: always; border-top: 2px solid #3498db; padding-top: 20px;">
       <h3>2. Fixed Issues by Type</h3>
-      <p style="color: #555;">Detailed breakdown of resolved problems by category. This helps identify recurring
-        technical themes and training needs.</p>
-      <div id="pdf-chart-2" style="width: 100%; height: 300px; text-align: center;"></div>
+      <p style="color: #333; line-height: 1.6;">Detailed breakdown of the <strong><?= $fixedCount ?></strong> resolved
+        problems by category.
+        This helps identify that <strong><?= count($problemLabels) ?></strong> different types of issues were
+        successfully addressed,
+        highlighting recurring technical themes and identifying specific areas for proactive maintenance.</p>
+      <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
     </div>
 
     <div style="margin-top: 30px;">
       <h3>3. Tickets by Branch</h3>
-      <p style="color: #555;">Shows which locations are reporting the most technical difficulties. Useful for regional
-        IT resource allocation.</p>
-      <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center;"></div>
+      <p style="color: #333; line-height: 1.6;">Distribution of tickets across
+        <strong><?= count($branchLabels) ?></strong> different locations.
+        This analysis is crucial for understanding regional IT demand and optimizing resource allocation for the most
+        active branches.</p>
+      <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; margin-top: 10px;"></div>
     </div>
 
-    <div style="margin-top: 30px; page-break-before: always;">
+    <div style="margin-top: 30px; page-break-before: always; border-top: 2px solid #3498db; padding-top: 20px;">
       <h3>4. Tickets Over Time (Trend)</h3>
-      <p style="color: #555;">Visualizes the daily volume of tickets. Ideal for spotting spikes in problems or long-term
-        improvement in system stability.</p>
-      <div id="pdf-chart-4" style="width: 100%; height: 300px; text-align: center;"></div>
+      <p style="color: #333; line-height: 1.6;">Visualizes the volume of tickets over the last 14 days.
+        With a daily average of
+        <strong><?= count($trendCounts) > 0 ? round(array_sum($trendCounts) / count($trendCounts), 1) : 0 ?></strong>
+        tickets,
+        this trend helps in spotting sudden spikes and evaluating long-term system stability.</p>
+      <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
     </div>
 
     <div
@@ -289,7 +304,7 @@ while ($row = $trendResult->fetch_assoc()) {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#f5f5f5' }
+            labels: { color: '#000000', font: { weight: 'bold' } }
           }
         }
       }
@@ -316,7 +331,7 @@ while ($row = $trendResult->fetch_assoc()) {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#f5f5f5' }
+            labels: { color: '#000000', font: { weight: 'bold' } }
           }
         }
       }
@@ -343,11 +358,11 @@ while ($row = $trendResult->fetch_assoc()) {
         },
         scales: {
           x: {
-            ticks: { stepSize: 5, color: '#f5f5f5', precision: 0 },
-            grid: { color: 'rgba(255,255,255,0.1)' }
+            ticks: { stepSize: 5, color: '#000000', precision: 0, font: { weight: 'bold' } },
+            grid: { color: 'rgba(0,0,0,0.1)' }
           },
           y: {
-            ticks: { color: '#f5f5f5' },
+            ticks: { color: '#000000', font: { weight: 'bold' } },
             grid: { display: false }
           }
         }
@@ -379,13 +394,13 @@ while ($row = $trendResult->fetch_assoc()) {
         },
         scales: {
           x: {
-            ticks: { color: '#f5f5f5' },
-            grid: { color: 'rgba(255,255,255,0.05)' }
+            ticks: { color: '#000000', font: { weight: 'bold' } },
+            grid: { color: 'rgba(0,0,0,0.05)' }
           },
           y: {
             beginAtZero: true,
-            ticks: { stepSize: 5, color: '#f5f5f5', precision: 0 },
-            grid: { color: 'rgba(255,255,255,0.1)' }
+            ticks: { stepSize: 5, color: '#000000', precision: 0, font: { weight: 'bold' } },
+            grid: { color: 'rgba(0,0,0,0.1)' }
           }
         }
       }
