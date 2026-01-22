@@ -123,13 +123,15 @@ if (file_exists($bgPath)) {
     style="display: none; width: 8.5in; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #000; background: white !important;">
 
     <!-- PDF PAGE 1 -->
-    <div class="pdf-page" style="position: relative !important; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; page-break-after: always; background: transparent !important;">
+    <div class="pdf-page"
+      style="position: relative !important; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; page-break-after: always; background: transparent !important;">
       <!-- Background Image for Page 1 -->
-      <img src="<?= $bgBase64 ?>" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; display: block;">
+      <img src="<?= $bgBase64 ?>"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; display: block;">
 
       <h1 style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0; background: transparent !important;">
         IT Help Desk Performance Report</h1>
-      <p style="text-align: right; color: #666;">Generated on: <?= date('Y-m-d H:i') ?></p>
+      <p style="text-align: right; color: #666; background: transparent !important;">Generated on: <?= date('Y-m-d H:i') ?></p>
 
       <div style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: transparent !important;">
         <div style="background: rgba(248, 249, 250, 0.85) !important; padding: 15px; border-radius: 8px; border-left: 4px solid #c0392b;">
@@ -147,7 +149,7 @@ if (file_exists($bgPath)) {
         <p style="color: #333; line-height: 1.6; background: transparent !important;">This diagram shows the relationship between reported issues and resolved tickets. 
           Currently, there are <strong><?= $issuesCount ?></strong> active issues and <strong><?= $fixedCount ?></strong> fixed tickets. 
         </p>
-        <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
+        <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
       </div>
 
       <div style="margin-top: 30px; background: transparent !important;">
@@ -155,20 +157,22 @@ if (file_exists($bgPath)) {
         <p style="color: #333; line-height: 1.6; background: transparent !important;">Distribution of tickets across <strong><?= count($branchLabels) ?></strong> different locations. 
           This analysis is crucial for understanding regional IT demand and optimizing resource allocation.
         </p>
-        <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; margin-top: 10px;"></div>
+        <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
       </div>
     </div>
 
     <!-- PDF PAGE 2 -->
-    <div class="pdf-page" style="position: relative !important; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; background: transparent !important;">
+    <div class="pdf-page"
+      style="position: relative !important; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; background: transparent !important;">
       <!-- Background Image for Page 2 -->
-      <img src="<?= $bgBase64 ?>" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; display: block;">
+      <img src="<?= $bgBase64 ?>"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; display: block;">
 
       <div style="margin-top: 0; background: transparent !important;">
         <h3 style="background: transparent !important;">2. Fixed Issues by Type</h3>
         <p style="color: #333; line-height: 1.6; background: transparent !important;">Detailed breakdown of the <strong><?= $fixedCount ?></strong> resolved problems by category. 
           This helps identify that <strong><?= count($problemLabels) ?></strong> different types of issues were successfully addressed.</p>
-        <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
+        <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
       </div>
 
       <div style="margin-top: 40px; background: transparent !important;">
@@ -176,11 +180,11 @@ if (file_exists($bgPath)) {
         <p style="color: #333; line-height: 1.6; background: transparent !important;">Visualizes the volume of tickets over the last 14 days. 
           With a daily average of <strong><?= count($trendCounts) > 0 ? round(array_sum($trendCounts) / count($trendCounts), 1) : 0 ?></strong> tickets.
         </p>
-        <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; margin-top: 10px;"></div>
+        <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
       </div>
 
       <div
-        style="margin-top: 80px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 12px; color: #999; text-align: center;">
+        style="margin-top: 80px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 12px; color: #999; text-align: center; background: transparent !important;">
         End of IT Help Desk Report - Confidential IT Data
       </div>
     </div>
