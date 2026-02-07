@@ -81,25 +81,6 @@ while ($row = $trendResult->fetch_assoc()) {
   $trendLabels[] = $row['day'];
   $trendCounts[] = (int) $row['total'];
 }
-
-/* =======================
-   Chart Data: Trend (Tickets Over Time)
-   ======================= */
-$trendResult = $conn->query("
-    SELECT DATE(created_at) AS day, COUNT(*) AS total
-    FROM tickets
-    GROUP BY DATE(created_at)
-    ORDER BY day ASC
-    LIMIT 14
-");
-
-$trendLabels = [];
-$trendCounts = [];
-
-while ($row = $trendResult->fetch_assoc()) {
-  $trendLabels[] = $row['day'];
-  $trendCounts[] = (int) $row['total'];
-}
 ?>
 
 <!DOCTYPE html>
@@ -133,77 +114,61 @@ while ($row = $trendResult->fetch_assoc()) {
 
     <!-- PDF PAGE 1 -->
     <div class="pdf-page"
-      style="width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; page-break-after: always;">
+      style="width: 100%; min-height: 11in; padding: 60px 40px; box-sizing: border-box; page-break-after: always; display: flex; flex-direction: column;">
 
-      <h1
-        style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0;">
+      <h1 style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0;">
         IT Help Desk Performance Report</h1>
-      <p style="text-align: right; color: #666;">Generated on: <?= date('Y-m-d H:i') ?></p>
+      <p style="text-align: right; color: #666; font-size: 14px;">Generated on: <?= date('Y-m-d H:i') ?></p>
 
-      <div style="margin: 30px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div
-          style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #c0392b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-          <h4 style="margin: 0; color: #7f8c8d; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Total
-            Issues</h4>
-          <h2 style="margin: 10px 0 0 0; color: #c0392b; font-size: 32px;"><?= $issuesCount ?></h2>
+      <div style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; page-break-inside: avoid;">
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #c0392b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <h4 style="margin: 0; color: #7f8c8d; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">Total Issues</h4>
+          <h2 style="margin: 5px 0 0 0; color: #c0392b; font-size: 28px;"><?= $issuesCount ?></h2>
         </div>
-        <div
-          style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #2ecc71; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-          <h4 style="margin: 0; color: #7f8c8d; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Total
-            Fixed</h4>
-          <h2 style="margin: 10px 0 0 0; color: #2ecc71; font-size: 32px;"><?= $fixedCount ?></h2>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #2ecc71; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <h4 style="margin: 0; color: #7f8c8d; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">Total Fixed</h4>
+          <h2 style="margin: 5px 0 0 0; color: #2ecc71; font-size: 28px;"><?= $fixedCount ?></h2>
         </div>
       </div>
 
-      <div style="margin-top: 40px;">
-        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">1. Issues
-          vs Fixed Performance</h3>
-        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
-          Comparison between reported issues and resolved tickets.
-          Currently, there are <strong><?= $issuesCount ?></strong> active issues and
-          <strong><?= $fixedCount ?></strong> fixed tickets.
+      <div style="margin-top: 20px; page-break-inside: avoid;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 10px; font-size: 18px;">1. Issues vs Fixed Performance</h3>
+        <p style="color: #34495e; line-height: 1.5; margin-bottom: 15px; font-size: 14px;">
+          Comparison between reported issues and resolved tickets. 
         </p>
-        <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; background: #fff;"></div>
+        <div id="pdf-chart-1" style="width: 100%; height: 280px; text-align: center; background: #fff;"></div>
       </div>
 
-      <div style="margin-top: 40px;">
-        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">3. Tickets
-          by Branch</h3>
-        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
-          Distribution of tickets across <strong><?= count($branchLabels) ?></strong> different locations.
-          Helps in optimizing resource allocation.
-        </p>
-        <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; background: #fff;"></div>
+      <div style="margin-top: 30px; page-break-inside: avoid;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 10px; font-size: 18px;">2. Fixed Issues by Type</h3>
+        <p style="color: #34495e; line-height: 1.5; margin-bottom: 15px; font-size: 14px;">
+          Breakdown of the <strong><?= $fixedCount ?></strong> resolved problems by category.</p>
+        <div id="pdf-chart-2" style="width: 100%; height: 280px; text-align: center; background: #fff;"></div>
       </div>
     </div>
 
     <!-- PDF PAGE 2 -->
-    <div class="pdf-page" style="width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box;">
+    <div class="pdf-page"
+      style="width: 100%; min-height: 11in; padding: 60px 40px; box-sizing: border-box; display: flex; flex-direction: column;">
 
-      <div style="margin-top: 0;">
-        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">2. Fixed
-          Issues by Type</h3>
-        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
-          Breakdown of the <strong><?= $fixedCount ?></strong> resolved problems by category.
-          <strong><?= count($problemLabels) ?></strong> different types of issues were addressed.
+      <div style="margin-top: 0; page-break-inside: avoid;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 10px; font-size: 18px;">3. Tickets by Branch</h3>
+        <p style="color: #34495e; line-height: 1.5; margin-bottom: 15px; font-size: 14px;">
+          Distribution of tickets across <strong><?= count($branchLabels) ?></strong> different locations. 
         </p>
-        <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; background: #fff;"></div>
+        <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; background: #fff;"></div>
       </div>
 
-      <div style="margin-top: 50px;">
-        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">4. Tickets
-          Over Time (Trend)</h3>
-        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
-          Ticket volume trend over the last 14 days.
-          Daily average:
-          <strong><?= count($trendCounts) > 0 ? round(array_sum($trendCounts) / count($trendCounts), 1) : 0 ?></strong>
-          tickets.
+      <div style="margin-top: 40px; page-break-inside: avoid;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 10px; font-size: 18px;">4. Tickets Over Time (Trend)</h3>
+        <p style="color: #34495e; line-height: 1.5; margin-bottom: 15px; font-size: 14px;">
+          Ticket volume trend over the last 14 days. 
         </p>
-        <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; background: #fff;"></div>
+        <div id="pdf-chart-4" style="width: 100%; height: 280px; text-align: center; background: #fff;"></div>
       </div>
 
       <div
-        style="margin-top: 100px; border-top: 1px solid #eee; padding-top: 20px; font-size: 11px; color: #95a5a6; text-align: center;">
+        style="margin-top: auto; border-top: 1px solid #eee; padding-top: 20px; font-size: 11px; color: #95a5a6; text-align: center;">
         End of IT Help Desk Report - Confidential IT Data
       </div>
     </div>
