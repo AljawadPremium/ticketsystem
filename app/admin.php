@@ -83,13 +83,22 @@ while ($row = $trendResult->fetch_assoc()) {
 }
 
 /* =======================
-   PDF Asset: Base64 Background
+   Chart Data: Trend (Tickets Over Time)
    ======================= */
-$bgPath = 'assets/PDFbackground.jpeg';
-$bgBase64 = '';
-if (file_exists($bgPath)) {
-  $bgData = file_get_contents($bgPath);
-  $bgBase64 = 'data:image/jpeg;base64,' . base64_encode($bgData);
+$trendResult = $conn->query("
+    SELECT DATE(created_at) AS day, COUNT(*) AS total
+    FROM tickets
+    GROUP BY DATE(created_at)
+    ORDER BY day ASC
+    LIMIT 14
+");
+
+$trendLabels = [];
+$trendCounts = [];
+
+while ($row = $trendResult->fetch_assoc()) {
+  $trendLabels[] = $row['day'];
+  $trendCounts[] = (int) $row['total'];
 }
 ?>
 
@@ -120,71 +129,81 @@ if (file_exists($bgPath)) {
 
   <!-- HIDDEN PDF TEMPLATE -->
   <div id="pdf-template"
-    style="display: none; width: 8.5in; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #000; background: white !important;">
+    style="display: none; width: 8.5in; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #000; background: white;">
 
     <!-- PDF PAGE 1 -->
     <div class="pdf-page"
-      style="position: relative !important; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; page-break-after: always; background: transparent !important;">
-      <!-- Background Image for Page 1 -->
-      <img src="<?= $bgBase64 ?>"
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; display: block;">
+      style="width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; page-break-after: always;">
 
-      <h1 style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0; background: transparent !important;">
+      <h1
+        style="text-align: center; color: #1a252f; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-top: 0;">
         IT Help Desk Performance Report</h1>
-      <p style="text-align: right; color: #666; background: transparent !important;">Generated on: <?= date('Y-m-d H:i') ?></p>
+      <p style="text-align: right; color: #666;">Generated on: <?= date('Y-m-d H:i') ?></p>
 
-      <div style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: transparent !important;">
-        <div style="background: rgba(248, 249, 250, 0.85) !important; padding: 15px; border-radius: 8px; border-left: 4px solid #c0392b;">
-          <h4 style="margin: 0; background: transparent !important;">Total Issues</h4>
-          <h2 style="margin: 5px 0; background: transparent !important;"><?= $issuesCount ?></h2>
+      <div style="margin: 30px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div
+          style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #c0392b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <h4 style="margin: 0; color: #7f8c8d; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Total
+            Issues</h4>
+          <h2 style="margin: 10px 0 0 0; color: #c0392b; font-size: 32px;"><?= $issuesCount ?></h2>
         </div>
-        <div style="background: rgba(248, 249, 250, 0.85) !important; padding: 15px; border-radius: 8px; border-left: 4px solid #2ecc71;">
-          <h4 style="margin: 0; background: transparent !important;">Total Fixed</h4>
-          <h2 style="margin: 5px 0; background: transparent !important;"><?= $fixedCount ?></h2>
+        <div
+          style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #2ecc71; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <h4 style="margin: 0; color: #7f8c8d; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Total
+            Fixed</h4>
+          <h2 style="margin: 10px 0 0 0; color: #2ecc71; font-size: 32px;"><?= $fixedCount ?></h2>
         </div>
       </div>
 
-      <div style="margin-top: 30px; background: transparent !important;">
-        <h3 style="background: transparent !important;">1. Issues vs Fixed Performance</h3>
-        <p style="color: #333; line-height: 1.6; background: transparent !important;">This diagram shows the relationship between reported issues and resolved tickets. 
-          Currently, there are <strong><?= $issuesCount ?></strong> active issues and <strong><?= $fixedCount ?></strong> fixed tickets. 
+      <div style="margin-top: 40px;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">1. Issues
+          vs Fixed Performance</h3>
+        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
+          Comparison between reported issues and resolved tickets.
+          Currently, there are <strong><?= $issuesCount ?></strong> active issues and
+          <strong><?= $fixedCount ?></strong> fixed tickets.
         </p>
-        <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
+        <div id="pdf-chart-1" style="width: 100%; height: 320px; text-align: center; background: #fff;"></div>
       </div>
 
-      <div style="margin-top: 30px; background: transparent !important;">
-        <h3 style="background: transparent !important;">3. Tickets by Branch</h3>
-        <p style="color: #333; line-height: 1.6; background: transparent !important;">Distribution of tickets across <strong><?= count($branchLabels) ?></strong> different locations. 
-          This analysis is crucial for understanding regional IT demand and optimizing resource allocation.
+      <div style="margin-top: 40px;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">3. Tickets
+          by Branch</h3>
+        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
+          Distribution of tickets across <strong><?= count($branchLabels) ?></strong> different locations.
+          Helps in optimizing resource allocation.
         </p>
-        <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
+        <div id="pdf-chart-3" style="width: 100%; height: 350px; text-align: center; background: #fff;"></div>
       </div>
     </div>
 
     <!-- PDF PAGE 2 -->
-    <div class="pdf-page"
-      style="position: relative !important; width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box; background: transparent !important;">
-      <!-- Background Image for Page 2 -->
-      <img src="<?= $bgBase64 ?>"
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; display: block;">
+    <div class="pdf-page" style="width: 100%; min-height: 11in; padding: 60px 50px; box-sizing: border-box;">
 
-      <div style="margin-top: 0; background: transparent !important;">
-        <h3 style="background: transparent !important;">2. Fixed Issues by Type</h3>
-        <p style="color: #333; line-height: 1.6; background: transparent !important;">Detailed breakdown of the <strong><?= $fixedCount ?></strong> resolved problems by category. 
-          This helps identify that <strong><?= count($problemLabels) ?></strong> different types of issues were successfully addressed.</p>
-        <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
+      <div style="margin-top: 0;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">2. Fixed
+          Issues by Type</h3>
+        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
+          Breakdown of the <strong><?= $fixedCount ?></strong> resolved problems by category.
+          <strong><?= count($problemLabels) ?></strong> different types of issues were addressed.
+        </p>
+        <div id="pdf-chart-2" style="width: 100%; height: 320px; text-align: center; background: #fff;"></div>
       </div>
 
-      <div style="margin-top: 40px; background: transparent !important;">
-        <h3 style="background: transparent !important;">4. Tickets Over Time (Trend)</h3>
-        <p style="color: #333; line-height: 1.6; background: transparent !important;">Visualizes the volume of tickets over the last 14 days. 
-          With a daily average of <strong><?= count($trendCounts) > 0 ? round(array_sum($trendCounts) / count($trendCounts), 1) : 0 ?></strong> tickets.
+      <div style="margin-top: 50px;">
+        <h3 style="color: #2c3e50; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px;">4. Tickets
+          Over Time (Trend)</h3>
+        <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
+          Ticket volume trend over the last 14 days.
+          Daily average:
+          <strong><?= count($trendCounts) > 0 ? round(array_sum($trendCounts) / count($trendCounts), 1) : 0 ?></strong>
+          tickets.
         </p>
-        <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; margin-top: 10px; background: transparent !important;"></div>
+        <div id="pdf-chart-4" style="width: 100%; height: 320px; text-align: center; background: #fff;"></div>
       </div>
 
       <div
-        style="margin-top: 80px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 12px; color: #999; text-align: center; background: transparent !important;">
+        style="margin-top: 100px; border-top: 1px solid #eee; padding-top: 20px; font-size: 11px; color: #95a5a6; text-align: center;">
         End of IT Help Desk Report - Confidential IT Data
       </div>
     </div>
@@ -426,7 +445,6 @@ if (file_exists($bgPath)) {
 
     /* ===== PDF Export Logic ===== */
     async function downloadPDF() {
-      const { jsPDF } = window;
       const template = document.getElementById('pdf-template');
 
       // Update Chart colors to Black for PDF capture
@@ -445,32 +463,24 @@ if (file_exists($bgPath)) {
       // Show template temporarily for capturing
       template.style.display = 'block';
 
-      // 2. WAIT FOR IMAGES TO LOAD (Backgrounds from Base64 or URL)
-      const images = template.getElementsByTagName('img');
-      const loadPromises = Array.from(images).map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
-      });
-      await Promise.all(loadPromises);
-
       // Capture charts as images and put them in the template
       for (let i = 0; i < chartIds.length; i++) {
         const canvas = document.getElementById(chartIds[i]);
         const imgData = canvas.toDataURL('image/png', 1.0);
         const container = document.getElementById(`pdf-chart-${i + 1}`);
-        if (container) container.innerHTML = `<img src="${imgData}" style="max-width: 100%; height: auto;">`;
+        if (container) container.innerHTML = `<img src="${imgData}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">`;
       }
 
       const opt = {
         margin: 0,
-        filename: 'IT_Help_Disk_Report.pdf',
+        filename: 'IT_Help_Desk_Report.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
           useCORS: true,
           letterRendering: true,
-          logging: true,
-          backgroundColor: null
+          logging: false,
+          backgroundColor: '#ffffff'
         },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
